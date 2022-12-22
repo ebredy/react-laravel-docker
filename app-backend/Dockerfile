@@ -4,7 +4,7 @@
 FROM composer:1.10 AS composer
 
 COPY composer.json /app
-COPY composer.lock /app
+#COPY composer.lock /app
 
 RUN composer install        \
     --ignore-platform-reqs  \
@@ -25,8 +25,8 @@ FROM node:14.17.0-alpine3.12 AS node
 WORKDIR /app
 
 COPY package.json           /app
-COPY package-lock.json      /app
-COPY webpack.mix.js         /app
+#COPY package-lock.json      /app
+COPY vite.config.js         /app
 COPY /resources             /app/resources
 
 RUN npm install && npm run dev
@@ -35,7 +35,7 @@ RUN npm install && npm run dev
 ########################################################################
 ### PHP
 
-FROM php:7.4-fpm-alpine3.12
+FROM php:8.0.5-fpm-alpine
 
 RUN apk update && apk add --no-cache \
     libpng-dev                       \
@@ -49,8 +49,8 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 COPY . /var/www
 COPY --from=composer /app/vendor                /var/www/html/vendor
-COPY --from=node     /app/public                /var/www/html/public/
-COPY --from=node     /app/mix-manifest.json     /var/www/html/mix-manifest.json
+#COPY --from=node     /app/public                /var/www/html/public/
+#COPY --from=node     /app/mix-manifest.json     /var/www/html/mix-manifest.json
 
 
 RUN addgroup -g 1000 -S www && \
